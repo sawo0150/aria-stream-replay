@@ -1,0 +1,7 @@
+name: gaussian_slam
+adapter: gaussian_slam
+expects:
+  - frame
+  - imu
+  - odom
+  - map_slice

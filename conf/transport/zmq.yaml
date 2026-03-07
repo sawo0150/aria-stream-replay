@@ -1,0 +1,5 @@
+type: zmq
+frame_endpoint: tcp://127.0.0.1:5555
+imu_endpoint: tcp://127.0.0.1:5556
+odom_endpoint: tcp://127.0.0.1:5557
+map_endpoint: tcp://127.0.0.1:5558

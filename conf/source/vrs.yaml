@@ -1,0 +1,6 @@
+type: vrs
+vrs_path: /path/to/data.vrs
+mps_path: null
+calibration_path: null
+camera_stream: rgb
+use_imu: true

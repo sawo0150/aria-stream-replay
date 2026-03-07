@@ -1,0 +1,6 @@
+mode: raw_odom
+rate: 1.0
+step_mode: false
+loop: false
+use_odom: true
+odom_source: open_loop

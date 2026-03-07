@@ -1,0 +1,19 @@
+defaults:
+  - source: vrs
+  - replay: raw
+  - transport: zmq
+  - backend: dummy
+  - map: none
+  - _self_
+
+app:
+  name: aria_stream_replay
+  mode: replay
+
+runtime:
+  device: cpu
+  seed: 42
+
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

@@ -1,0 +1,8 @@
+mode: oracle_frustum
+rate: 1.0
+step_mode: false
+loop: false
+use_odom: true
+odom_source: closed_loop
+send_map_slice: true
+oracle: true
