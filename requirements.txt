@@ -1,0 +1,4 @@
+open3d
+projectaria-tools
+
+pip install --upgrade projectaria-tools'[all]'
