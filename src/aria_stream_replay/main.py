@@ -1,3 +1,5 @@
+# main.py
+
 import os
 import sys
 import hydra
@@ -21,7 +23,22 @@ def main(cfg: DictConfig):
     vrs_path = os.path.expanduser(cfg.source.vrs_path)
     
     # 2. 모듈 초기화 (Hydra Config 사용)
-    reader = VrsReader(vrs_path)  
+    reader = VrsReader(
+        vrs_path=vrs_path,
+        camera_stream=cfg.source.camera_stream,
+        rectify_cfg=cfg.source.rectify,
+        calibration_path=cfg.source.calibration_path,
+    )
+
+    # 현재 publisher가 내보내는 최종 이미지 calibration 로그 출력
+    out_calib = reader.get_output_calibration()
+    print("[VrsReader] Output calibration for downstream:")
+    print(
+        f"  width={out_calib['width']}, height={out_calib['height']}, "
+        f"fx={out_calib['fx']:.3f}, fy={out_calib['fy']:.3f}, "
+        f"cx={out_calib['cx']:.3f}, cy={out_calib['cy']:.3f}"
+    )
+
     mps_reader = None
     if cfg.replay.use_odom:
         mps_dir = os.path.expanduser(cfg.source.mps_path)
@@ -48,7 +65,7 @@ def main(cfg: DictConfig):
             # 메시지 패키징 및 ZMQ 전송
             msg = FrameMsg(
                 seq=seq,
-                sensor_name="rgb",
+                sensor_name=reader.get_output_sensor_name(),
                 device_time_ns=ts_ns,
                 image=image
             )
@@ -66,8 +83,12 @@ def main(cfg: DictConfig):
 
             seq += 1
             if seq % 30 == 0: # 30프레임마다 로그 출력
-                print(f"Published Frame {seq} | Timestamp: {ts_ns}")
-                
+                print(
+                    f"Published Frame {seq} | Timestamp: {ts_ns} | "
+                    f"sensor={reader.get_output_sensor_name()}"
+                )
+                 
+
     except KeyboardInterrupt:
         print("Replay stopped by user.")
         publisher.send_control(ControlMsg(command="STOP"))
