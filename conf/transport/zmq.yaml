@@ -1,5 +1,10 @@
+# transport/zmq.yaml
+
+# 내부 프로세스 간 통신(IPC)을 위한 ZeroMQ 설정
+# 각 데이터 타입별로 독립된 소켓 주소(Endpoint)를 가집니다.
+
 type: zmq
-frame_endpoint: tcp://127.0.0.1:5555
-imu_endpoint: tcp://127.0.0.1:5556
-odom_endpoint: tcp://127.0.0.1:5557
-map_endpoint: tcp://127.0.0.1:5558
+frame_endpoint: tcp://127.0.0.1:5555  # 이미지 프레임 전송용 주소
+imu_endpoint: tcp://127.0.0.1:5556    # IMU 센서 전송용 주소
+odom_endpoint: tcp://127.0.0.1:5557   # Odom(Pose) 전송용 주소
+map_endpoint: tcp://127.0.0.1:5558    # Map Slice 전송용 주소

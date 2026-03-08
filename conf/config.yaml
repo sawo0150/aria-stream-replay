@@ -1,9 +1,13 @@
+# config.yaml
+# 프로젝트 메인 설정 파일
+# 이 파일에서 기본으로 사용할 하위 설정 파일들의 조합(defaults)을 결정합니다.
+
 defaults:
-  - source: vrs
-  - replay: raw
-  - transport: zmq
-  - backend: dummy
-  - map: none
+  - source: vrs            # 데이터 소스: vrs(녹화본) 또는 live(실시간)
+  - replay: raw_odom            # 재생 모드: raw(이미지만), raw_odom, oracle_frustum
+  - transport: zmq         # 통신 프로토콜: zmq 또는 grpc
+  - backend: dummy         # 연결할 백엔드: dummy 또는 gaussian_slam
+  - map: none              # 사전 맵 사용 여부
   - _self_
 
 app:
@@ -16,4 +20,5 @@ runtime:
 
 hydra:
   run:
-    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    # 실행 시 생성되는 로그와 출력물의 저장 경로 (실행 시간별로 폴더 생성)
+    dir: ../aria-outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

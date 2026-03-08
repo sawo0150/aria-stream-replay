@@ -1,0 +1,19 @@
+Metadata-Version: 2.4
+Name: aria-stream-replay
+Version: 0.1.0
+Summary: Modular VRS-to-stream replay frontend for incremental Gaussian SLAM backends
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: hydra-core
+Requires-Dist: omegaconf
+Requires-Dist: numpy
+Requires-Dist: opencv-python
+Requires-Dist: pyzmq
+Requires-Dist: rich
+Dynamic: license-file
+
+# aria-stream-replay
+aria-stream-replay
+
+pip install -e .

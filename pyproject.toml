@@ -7,10 +7,10 @@ name = "aria-stream-replay"
 version = "0.1.0"
 description = "Modular VRS-to-stream replay frontend for incremental Gaussian SLAM backends"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = [
-  "hydra-core>=1.3",
-  "omegaconf>=2.3",
+  "hydra-core",
+  "omegaconf",
   "numpy",
   "opencv-python",
   "pyzmq",

@@ -1,6 +1,14 @@
+# source/vrs.yaml
+
+# 입력 데이터 소스가 'VRS 파일'일 때의 설정
 type: vrs
-vrs_path: /path/to/data.vrs
-mps_path: null
+
+# VRS 파일의 전체 경로
+vrs_path: ~/Desktop/26-1_RPM/CustomData/Aria_recordings/301_1253/301_1253.vrs
+# MPS 결과물이 들어있는 최상위 폴더 경로 추가
+mps_path: ~/Desktop/26-1_RPM/CustomData/Aria_recordings/301_1253/mps_301_1253_vrs
+
 calibration_path: null
-camera_stream: rgb
-use_imu: true
+
+camera_stream: rgb         # 사용할 카메라 스트림 (rgb, slam_left, slam_right)
+use_imu: true              # IMU 데이터 추출 여부

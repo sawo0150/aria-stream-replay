@@ -1,3 +1,5 @@
+# backend/gaussian_slam.yaml
+
 name: gaussian_slam
 adapter: gaussian_slam
 expects:

@@ -1,6 +1,15 @@
+# conf/replay/raw_odom.yaml
+# 모드 B. Odom-assisted Replay 모드
+# Raw 이미지와 함께 Odom(Pose)을 ZMQ로 같이 전송합니다.
+
 mode: raw_odom
 rate: 1.0
 step_mode: false
 loop: false
+
+# Odom 활성화
 use_odom: true
+
+# Odom 소스 선택 (open_loop 또는 closed_loop)
+# 온라인 SLAM 실험을 위해서는 미래 정보를 참조하지 않는 'open_loop'를 기본으로 사용합니다.
 odom_source: open_loop
