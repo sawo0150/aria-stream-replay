@@ -21,4 +21,4 @@ runtime:
 hydra:
   run:
     # 실행 시 생성되는 로그와 출력물의 저장 경로 (실행 시간별로 폴더 생성)
-    dir: ../aria-outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: ../stream-outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}

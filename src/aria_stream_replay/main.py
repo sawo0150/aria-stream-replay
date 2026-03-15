@@ -1,4 +1,4 @@
-# main.py
+# aria_stream_replay/main.py
 
 import os
 import sys
@@ -12,7 +12,7 @@ from aria_stream_replay.dataio.vrs_reader import VrsReader
 from aria_stream_replay.dataio.mps_reader import MpsReader
 from aria_stream_replay.core.replay_clock import ReplayClock
 from aria_stream_replay.transport.zmq_pub import ZmqPublisher
-from aria_stream_replay.event_types import FrameMsg, OdomMsg, ControlMsg
+from aria_stream_replay.event_types import FrameMsg, OdomMsg, BundleMsg, ControlMsg
 
 @hydra.main(version_base=None, config_path="../../conf", config_name="config")
 def main(cfg: DictConfig):
@@ -44,12 +44,21 @@ def main(cfg: DictConfig):
         mps_dir = os.path.expanduser(cfg.source.mps_path)
         mps_reader = MpsReader(mps_dir=mps_dir, odom_source=cfg.replay.odom_source)
 
-    clock = ReplayClock(speed_factor=cfg.replay.rate) 
-    publisher = ZmqPublisher(frame_endpoint=cfg.transport.frame_endpoint, 
-                             odom_endpoint=cfg.transport.odom_endpoint)
+    clock = ReplayClock(
+        mode=cfg.replay.clock_mode,
+        speed_factor=cfg.replay.rate,
+        fps=cfg.replay.fps,
+    )
+
+    publisher = ZmqPublisher(bundle_endpoint=cfg.transport.bundle_endpoint)
+
+    print(f"Replay clock mode={cfg.replay.clock_mode}, rate={cfg.replay.rate}, fps={cfg.replay.fps}")
     print("Starting Replay Pipeline...")
+
+    # publish된 bundle 기준 seq
     seq = 0
-    
+    # reader에서 읽은 총 프레임 수(드롭 포함)
+    raw_seq = 0
     try:
         while True:
             # DataSource에서 데이터 읽기
@@ -58,19 +67,30 @@ def main(cfg: DictConfig):
                 print("End of VRS stream.")
                 publisher.send_control(ControlMsg(command="EOS"))
                 break
-                
-            # ReplayClock으로 시간 동기화 (원래 FPS 모방)
-            clock.wait_until(ts_ns)
-            
-            # 메시지 패키징 및 ZMQ 전송
-            msg = FrameMsg(
+        
+            raw_seq += 1
+
+            # ReplayClock:
+            # - rate 모드: 항상 True
+            # - fps  모드: slot 중복 프레임이면 False(drop)
+            should_publish = clock.wait_until(ts_ns)
+            if not should_publish:
+                if raw_seq % 100 == 0:
+                    print(
+                        f"Dropped raw frame {raw_seq} | Timestamp: {ts_ns} "
+                        f"(clock_mode=fps, target_fps={cfg.replay.fps})"
+                    )
+                continue
+
+            frame_msg = FrameMsg(
                 seq=seq,
                 sensor_name=reader.get_output_sensor_name(),
                 device_time_ns=ts_ns,
                 image=image
             )
-            publisher.send_frame(msg)
-            # 4. Odom이 활성화되어 있다면, 현재 이미지 시간과 가장 가까운 Odom을 쏴줍니다.
+            
+            
+            odom_msg = None
             if cfg.replay.use_odom and mps_reader is not None:
                 T_wd = mps_reader.get_nearest_pose(ts_ns)
                 odom_msg = OdomMsg(
@@ -79,13 +99,24 @@ def main(cfg: DictConfig):
                     T_world_device=T_wd,
                     source=cfg.replay.odom_source
                 )
-                publisher.send_odom(odom_msg)
-
+                
+                
+            bundle_msg = BundleMsg(
+                frame=frame_msg,
+                odom=odom_msg
+            )
+            publisher.send_bundle(bundle_msg)
             seq += 1
-            if seq % 30 == 0: # 30프레임마다 로그 출력
+            if seq % 30 == 0:
+
                 print(
-                    f"Published Frame {seq} | Timestamp: {ts_ns} | "
-                    f"sensor={reader.get_output_sensor_name()}"
+                    f"Published Bundle {seq} | raw_frame={raw_seq} | "
+                    f"Timestamp: {ts_ns} | "
+                    f"clock_mode={cfg.replay.clock_mode} | "
+                    f"fps={cfg.replay.fps if cfg.replay.clock_mode == 'fps' else 'n/a'} | "
+                    f"sensor={reader.get_output_sensor_name()} | "
+                    f"odom={'yes' if odom_msg is not None else 'no'}"
+
                 )
                  
 

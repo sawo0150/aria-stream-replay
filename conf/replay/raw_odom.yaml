@@ -3,13 +3,22 @@
 # Raw 이미지와 함께 Odom(Pose)을 ZMQ로 같이 전송합니다.
 
 mode: raw_odom
-rate: 1.0
 step_mode: false
-loop: false
+loop: true
+
+# Replay pacing 정책
+# - rate: 원본 timestamp 간격을 유지하되 재생 속도만 배율로 조절
+# - fps : 원본 timestamp는 그대로 보내되, 발행은 wall-clock 기준 고정 fps로 수행
+clock_mode: fps   # [rate, fps]
+
+# clock_mode=rate 일 때 사용
+rate: 1.0
+# clock_mode=fps 일 때 사용
+fps: 1.0
 
 # Odom 활성화
 use_odom: true
 
 # Odom 소스 선택 (open_loop 또는 closed_loop)
 # 온라인 SLAM 실험을 위해서는 미래 정보를 참조하지 않는 'open_loop'를 기본으로 사용합니다.
-odom_source: open_loop
+odom_source: closed_loop
